@@ -1,7 +1,12 @@
 ﻿using Carter;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ToDoData.DataAccess;
+using ToDoData.DataAccess.Interfaces;
+using ToDoData.Helpers;
 
 namespace ToDoAPI;
 
@@ -9,19 +14,29 @@ public static class Configuration
 {
     public static void RegisterServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services
+               .AddEndpointsApiExplorer()
+               .AddSwaggerGen()
+               .AddHttpContextAccessor()
+               .AddCarter();
+
         builder.Services.AddCors(options => options.AddPolicy(name: "NgOrigins",
             policy =>
             {
                 policy.WithOrigins("").AllowAnyMethod().AllowAnyHeader();
             }));
-        builder.Services.AddCarter();
+        builder.Services.AddDbContext<DataContext>(options =>
+        {
+            options.UseSqlite(builder.Configuration.GetConnectionString("Default"), x => x.MigrationsAssembly("ToDoData"));
+        });
     }
 
     public static void RegisterCustomServices(this WebApplicationBuilder builder)
     {
-
+        builder.Services.AddTransient<IUserDbService, UserDbService>();
+        builder.Services.AddTransient<ITokenDbService, TokenDbService>();
+        builder.Services.AddTransient<IToDoDbService, ToDoDbService>();
+        builder.Services.AddTransient<IJWTExtractor, JWTExtractor>();
     }
 
     public static void RegisterAuthServices(this WebApplicationBuilder builder)
@@ -42,6 +57,14 @@ public static class Configuration
                     ValidIssuer = builder.Configuration.GetValue<string>("Auth:Issuer"),
                     ValidAudience = builder.Configuration.GetValue<string>("Auth:Audience"),
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("Auth:SecretKey")))
+                };
+                opts.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["session"];
+                        return Task.CompletedTask;
+                    }
                 };
             });
     }
