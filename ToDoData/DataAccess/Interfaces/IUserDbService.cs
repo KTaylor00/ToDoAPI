@@ -7,4 +7,5 @@ public interface IUserDbService
 {
     Task<LoginResponse> LoginUser(LoginDto user);
     Task RegisterUser(RegisterDto userDto);
+    void LogoutUser();
 }

@@ -14,8 +14,9 @@ public class UserEndpoint : ICarterModule
     {
         var users = app.MapGroup("/users");
 
-        users.MapPost("/login", LoginUser);
-        users.MapPost("/register", RegisterUser);
+        users.MapPost("/login", LoginUser).AllowAnonymous();
+        users.MapPost("/register", RegisterUser).AllowAnonymous();
+        users.MapPost("/logout", LogoutUser).AllowAnonymous();
     }
 
     #region Post Methods
@@ -42,7 +43,21 @@ public class UserEndpoint : ICarterModule
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "The Post request to /auth failed.");
+            Log.Error(ex, "The Post request to /users failed.");
+            return TypedResults.BadRequest();
+        }
+    }
+
+    private static Results<Ok, BadRequest> LogoutUser(IUserDbService data)
+    {
+        try
+        {
+            data.LogoutUser();
+            return TypedResults.Ok();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "The Post request to /users failed.");
             return TypedResults.BadRequest();
         }
     }

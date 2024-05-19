@@ -37,7 +37,16 @@ public class UserDbService(DataContext context, ITokenDbService tokenDbService, 
 
     public async Task<LoginResponse> LoginUser(LoginDto loginDto)
     {
-        var user = context.Users.Single(u => u.Username == loginDto.Username);
+        var user = context.Users.Single(u => u.Username == loginDto.Username.ToLower());
+
+        if (user == null)
+        {
+            return new LoginResponse
+            {
+                Success = false,
+                Error = "Incorrect user details"
+            };
+        }
 
         if (!Hasher.VerifyHash(loginDto.Password, user?.Password, user?.PasswordSalt))
         {
@@ -71,5 +80,10 @@ public class UserDbService(DataContext context, ITokenDbService tokenDbService, 
         };
 
         return response;
+    }
+
+    public void LogoutUser()
+    {
+        accessor.HttpContext?.Response.Cookies.Delete("session");
     }
 }

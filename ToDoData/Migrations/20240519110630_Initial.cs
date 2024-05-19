@@ -41,8 +41,7 @@ namespace ToDoData.Migrations
                     Task = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Modified = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Is_Completed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Is_Deleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Is_Completed = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

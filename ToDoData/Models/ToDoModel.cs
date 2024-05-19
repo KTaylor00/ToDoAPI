@@ -12,5 +12,4 @@ public class ToDoModel
     public DateTime Created { get; set; }
     public DateTime Modified { get; set; }
     public bool Is_Completed { get; set; }
-    public bool Is_Deleted { get; set; }
 }

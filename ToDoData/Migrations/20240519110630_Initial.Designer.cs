@@ -11,7 +11,7 @@ using ToDoData.DataAccess;
 namespace ToDoData.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240517160353_Initial")]
+    [Migration("20240519110630_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -30,9 +30,6 @@ namespace ToDoData.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("Is_Completed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("Is_Deleted")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("Modified")

@@ -14,13 +14,12 @@ public class ToDoEndpoint : ICarterModule
         var todos = app.MapGroup("/to-dos");
 
         todos.MapGet("", GetTasks);
-        todos.MapGet("/task", GetTaskById);
 
-        todos.MapPost("", AddTodo);
+        todos.MapPost("", AddTask);
 
-        todos.MapPut("", EditTodo);
+        todos.MapPut("", UpdateTasks);
 
-        todos.MapDelete("", DeleteTodo);
+        todos.MapDelete("", DeleteTask);
     }
 
     #region Get Methods
@@ -38,28 +37,14 @@ public class ToDoEndpoint : ICarterModule
         }
     }
 
-    private static async Task<Results<Ok<ToDoDto>, BadRequest>> GetTaskById([FromQuery] int todoId, IToDoDbService data)
-    {
-        try
-        {
-            var output = await data.GetTaskById(todoId);
-            return TypedResults.Ok(output);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "The Get request to /to-dos failed.");
-            return TypedResults.BadRequest();
-        }
-    }
-
     #endregion
 
     #region Post Methods
-    private static async Task<Results<Ok, BadRequest>> AddTodo([FromBody] ToDoDto todo, IToDoDbService data)
+    private static async Task<Results<Ok, BadRequest>> AddTask([FromBody] ToDoDto todo, IToDoDbService data)
     {
         try
         {
-            await data.AddTodo(todo);
+            await data.AddTask(todo);
             return TypedResults.Ok();
         }
         catch (Exception ex)
@@ -72,11 +57,11 @@ public class ToDoEndpoint : ICarterModule
     #endregion
 
     #region Put Methods
-    private static async Task<Results<Ok, BadRequest>> EditTodo([FromBody] ToDoDto todo, IToDoDbService data)
+    private static async Task<Results<Ok, BadRequest>> UpdateTasks([FromBody] List<ToDoDto> todo, IToDoDbService data)
     {
         try
         {
-            await data.EditTodo(todo);
+            await data.UpdateTasks(todo);
             return TypedResults.Ok();
         }
         catch (Exception ex)
@@ -89,11 +74,11 @@ public class ToDoEndpoint : ICarterModule
     #endregion
 
     #region Delete Methods
-    private static async Task<Results<Ok, BadRequest>> DeleteTodo([FromQuery] int todoId, IToDoDbService data)
+    private static async Task<Results<Ok, BadRequest>> DeleteTask([FromQuery] int id, IToDoDbService data)
     {
         try
         {
-            await data.DeleteTodo(todoId);
+            await data.DeleteTask(id);
             return TypedResults.Ok();
         }
         catch (Exception ex)

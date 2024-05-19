@@ -23,7 +23,7 @@ public static class Configuration
         builder.Services.AddCors(options => options.AddPolicy(name: "NgOrigins",
             policy =>
             {
-                policy.WithOrigins("").AllowAnyMethod().AllowAnyHeader();
+                policy.WithOrigins("http://localhost:4200").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
             }));
         builder.Services.AddDbContext<DataContext>(options =>
         {
@@ -46,27 +46,31 @@ public static class Configuration
                 .RequireAuthenticatedUser()
                 .Build());
 
-        builder.Services.AddAuthentication("Bearer")
-            .AddJwtBearer(opts =>
+        builder.Services.AddAuthentication(options => 
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(opts =>
+        {
+            opts.TokenValidationParameters = new()
             {
-                opts.TokenValidationParameters = new()
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration.GetValue<string>("Auth:Issuer"),
+                ValidAudience = builder.Configuration.GetValue<string>("Auth:Audience"),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("Auth:Key")))
+            };
+            opts.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = builder.Configuration.GetValue<string>("Auth:Issuer"),
-                    ValidAudience = builder.Configuration.GetValue<string>("Auth:Audience"),
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("Auth:SecretKey")))
-                };
-                opts.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        context.Token = context.Request.Cookies["session"];
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+                    context.Token = context.Request.Cookies["session"];
+                    return Task.CompletedTask;
+                }
+            };
+        });
     }
 
     public static void RegisterMiddlewares(this WebApplication app)

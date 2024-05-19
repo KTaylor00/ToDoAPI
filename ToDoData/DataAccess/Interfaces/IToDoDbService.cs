@@ -5,8 +5,7 @@ namespace ToDoData.DataAccess.Interfaces;
 public interface IToDoDbService
 {
     Task<List<ToDoDto>> GetTasks();
-    Task<ToDoDto> GetTaskById(int id);
-    Task AddTodo(ToDoDto todoDto);
-    Task EditTodo(ToDoDto todoDto);
-    Task DeleteTodo(int id);
+    Task AddTask(ToDoDto todoDto);
+    Task UpdateTasks(List<ToDoDto> todoDto);
+    Task DeleteTask(int id);
 }

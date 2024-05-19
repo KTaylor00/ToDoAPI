@@ -29,9 +29,6 @@ namespace ToDoData.Migrations
                     b.Property<bool>("Is_Completed")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("Is_Deleted")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime>("Modified")
                         .HasColumnType("TEXT");
 
