@@ -15,3 +15,5 @@ The ToDoData project is a library project that houses all the necessary folders 
 You should now be able to run the project via https, I have set it up to use the https localhost url. The http variant won't work with the frontend app.
 
 The API should open in the browser and you should see swagger if all was successful.
+
+If you would like to view the database, you can download DB Browser from here -> https://sqlitebrowser.org/dl/ to view the todo.db file.
